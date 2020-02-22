@@ -76,6 +76,7 @@ low(adapter)
 
         // GET /root
         app.get('/', (req, res) => {
+            handleDonation()
             const root = db.get('config.root')
                 .value()
             res.send(root)
@@ -139,23 +140,43 @@ const publishToMAM = async data => {
 const handleDonation = async (payment) => {
     let data = await fetchData()
 
-    console.log("nodes data", data)
+    console.log("nodes count", data.length)
     
     // TODO
     // TODO
     // TODO
-    
+
     // make payout
 
-    // 1. get Addresses
+    // 1. get node_with_addresses
+    const nodes_with_addresses = data.filter((node) => node.address );
+
+    console.log("nodes_with_addresses count", nodes_with_addresses.length)
+
     // 2. calculate shares
+    let total_points = 0;
+    nodes_with_addresses.forEach(function(object){
+      total_points = object.points + total_points;
+    })
+  
+    nodes_with_addresses.forEach(function(object){
+      object.share = object.points / total_points;
+    })
+
+    console.log("nodes_with_addresses[0]", nodes_with_addresses[0])
+    console.log("nodes_with_addresses[1]", nodes_with_addresses[1])
+
+  
     // 3. create bundle
+
+
     // 4. payout to all addresses
 
     // /TODO
     // /TODO
     // /TODO
 
+    return {}
     // Hash data
     const hash = sha256(JSON.stringify(data))
 
