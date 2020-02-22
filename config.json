@@ -1,0 +1,5 @@
+{
+    "PROVIDER": "https://nodes.devnet.iota.org",
+    "URL": "https://score.tanglebay.org/nodes",
+    "APP_PORT": 3000
+}
