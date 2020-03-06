@@ -18,6 +18,7 @@
     "iota-generate-seed": "^1.0.0",
     "iota-payment": "0.0.28",
     "js-sha256": "^0.9.0",
-    "lowdb": "^1.0.0"
+    "lowdb": "^1.0.0",
+    "request": "^2.88.2"
   }
 }

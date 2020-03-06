@@ -1,3 +1,4 @@
+const request = require('request')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors');
@@ -141,40 +142,71 @@ const handleDonation = async (payment) => {
     let data = await fetchData()
 
     console.log("nodes count", data.length)
-    
-    // TODO
-    // TODO
-    // TODO
 
     // make payout
 
     // 1. get node_with_addresses
-    const nodes_with_addresses = data.filter((node) => node.address );
+    const all_nodes_with_addresses = data.filter((node) => node.address);
 
-    console.log("nodes_with_addresses count", nodes_with_addresses.length)
+    console.log("all_nodes_with_addresses count", all_nodes_with_addresses.length)
+
+    //remove spent addresses
+    let addresses = all_nodes_with_addresses.map(e => e.address.slice(0, 81))
+    let spentStatus = await wereAddressesSpentFrom(addresses)
+    let nodes_with_addresses = all_nodes_with_addresses.filter((obj, index) => spentStatus[index] == false)
 
     // 2. calculate shares
+    let total_iotas = await paymentModule.getBalance()
     let total_points = 0;
-    nodes_with_addresses.forEach(function(object){
-      total_points = object.points + total_points;
-    })
-  
-    nodes_with_addresses.forEach(function(object){
-      object.share = object.points / total_points;
+
+    //calculate total points
+    nodes_with_addresses.forEach(function (object) {
+        total_points = object.points + total_points;
     })
 
-    console.log("nodes_with_addresses[0]", nodes_with_addresses[0])
-    console.log("nodes_with_addresses[1]", nodes_with_addresses[1])
+    //calculate shares, assign rounded iota value and calculate remaining iotas
+    let assigned_iotas = 0
+    nodes_with_addresses.forEach(function (object) {
+        object.share = object.points / total_points
+        object.iotas = Math.floor(total_iotas * object.share)
+        assigned_iotas = object.iotas + assigned_iotas;
+    })
+    let remaining = total_iotas - assigned_iotas
+    console.log(assigned_iotas);
+    console.log(remaining);
 
-  
-    // 3. create bundle
+    //sort by value, highest first
+    nodes_with_addresses.sort((a, b) => b.iotas - a.iotas)
 
+    //distribute remaining iotas and calculate total amount
+    let calculated_total_iotas = 0
+    nodes_with_addresses.map((e, index) => {
+        index < remaining ? e.iotas += 1 : e.iotas
+        calculated_total_iotas = e.iotas + calculated_total_iotas;
+    })
 
-    // 4. payout to all addresses
+    console.log(calculated_total_iotas);
+    if (total_iotas != calculated_total_iotas) {
+        throw "Assigned iota amount doesn't match total_iotas"
+    }
 
-    // /TODO
-    // /TODO
-    // /TODO
+    console.log(nodes_with_addresses);
+
+    //send payouts
+    let tag = 'DOCK9PAYOUT'
+    nodes_with_addresses.forEach(async e => {
+        try {
+            let payout = await paymentModule.payout.send({
+                address: e.address,
+                value: e.iotas,
+                message: `https://dock.tanglebay.org payout!\nYour node has ${e.points} points which is ${Math.floor(e.share * 1000) / 1000}%`,
+                tag
+            })
+            console.log(`Payout with ${payout.value} created for ${payout.address}`);
+        } catch (e) {
+            console.log(e)
+        }
+    })
 
     return {}
     // Hash data
@@ -191,4 +223,34 @@ const handleDonation = async (payment) => {
     }
 
     return { snapshot: snapshot, state: mam.state }
+}
+
+function wereAddressesSpentFrom(addresses, provider) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            var command = {
+                command: 'wereAddressesSpentFrom',
+                addresses: addresses
+            }
+
+            var options = {
+                url: PROVIDER,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-IOTA-API-Version': '1',
+                    'Content-Length': Buffer.byteLength(JSON.stringify(command))
+                },
+                json: command
+            }
+
+            request(options, function (error, response, data) {
+                if (!error && response.statusCode == 200) {
+                    resolve(data.states)
+                }
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
 }
