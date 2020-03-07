@@ -194,19 +194,19 @@ const handleDonation = async (payment) => {
 
     //send payouts
     let tag = 'POOL9PAYOUT'
-    nodes_with_addresses.forEach(async e => {
+    for(node of nodes_with_addresses){
         try {
             let payout = await paymentModule.payout.send({
-                address: e.address,
-                value: e.iotas,
-                message: `einfachIOTA Pool payout!\nYour node has ${e.points} points which is ${Math.floor(e.share * 1000) / 1000}%`,
+                address: node.address,
+                value: node.iotas,
+                message: `einfachIOTA Pool payout!\nYour node has ${node.points} points which is ${Math.floor(node.share * 1000) / 1000}%`,
                 tag
             })
             console.log(`Payout with ${payout.value} created for ${payout.address}`);
         } catch (e) {
             console.log(e)
         }
-    })
+    }
 
     return {}
     // Hash data
