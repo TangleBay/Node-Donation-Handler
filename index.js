@@ -193,14 +193,14 @@ const handleDonation = async (payment) => {
     console.log(nodes_with_addresses);
 
     //send payouts
-    let tag = 'DOCK9PAYOUT'
-    nodes_with_addresses.forEach(async e => {
+    let tag = 'POOL9PAYOUT'
+    for(node of nodes_with_addresses){
         try {
             if(e.iotas>0){
                 let payout = await paymentModule.payout.send({
                     address: e.address,
                     value: e.iotas,
-                    message: `https://dock.tanglebay.org payout!\nYour node has ${e.points} points which is ${Math.floor(e.share * 1000) / 1000}%`,
+                    message: `einfachIOTA Pool payout!\nYour node has ${node.points} points which is ${Math.floor(node.share * 1000) / 1000}%`,
                     tag
                 })
                 console.log(`Payout with ${payout.value} created for ${payout.address}`);
@@ -208,7 +208,7 @@ const handleDonation = async (payment) => {
         } catch (e) {
             console.log(e)
         }
-    })
+    }
 
     return {}
     // Hash data
