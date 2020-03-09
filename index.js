@@ -196,13 +196,15 @@ const handleDonation = async (payment) => {
     let tag = 'DOCK9PAYOUT'
     nodes_with_addresses.forEach(async e => {
         try {
-            let payout = await paymentModule.payout.send({
-                address: e.address,
-                value: e.iotas,
-                message: `https://dock.tanglebay.org payout!\nYour node has ${e.points} points which is ${Math.floor(e.share * 1000) / 1000}%`,
-                tag
-            })
-            console.log(`Payout with ${payout.value} created for ${payout.address}`);
+            if(e.iotas>0){
+                let payout = await paymentModule.payout.send({
+                    address: e.address,
+                    value: e.iotas,
+                    message: `https://dock.tanglebay.org payout!\nYour node has ${e.points} points which is ${Math.floor(e.share * 1000) / 1000}%`,
+                    tag
+                })
+                console.log(`Payout with ${payout.value} created for ${payout.address}`);
+            }
         } catch (e) {
             console.log(e)
         }
