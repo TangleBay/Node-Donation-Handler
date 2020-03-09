@@ -196,10 +196,10 @@ const handleDonation = async (payment) => {
     let tag = 'POOL9PAYOUT'
     for(node of nodes_with_addresses){
         try {
-            if(e.iotas>0){
+            if(node.iotas>0){
                 let payout = await paymentModule.payout.send({
-                    address: e.address,
-                    value: e.iotas,
+                    address: node.address,
+                    value: node.iotas,
                     message: `einfachIOTA Pool payout!\nYour node has ${node.points} points which is ${Math.floor((node.share*100) * 1000) / 1000}%`,
                     tag
                 })
