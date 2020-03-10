@@ -36,16 +36,17 @@ let server = paymentModule.createServer(app, options)
 //Create an event handler which is called, when a payment was successfull
 let onPaymentSuccess = function (payment) {
     console.log(`Payment received:`, payment);
-    handleDonation(payment).then((response) => {
-        db.set('config.state', response.state)
-            .write()
+    handleDonation(payment)
+    // .then((response) => {
+    //     db.set('config.state', response.state)
+    //         .write()
 
-        db.get('snapshots')
-            .push(response.snapshot)
-            .last()
-            .assign({ id: Date.now().toString() })
-            .write()
-    })
+    //     db.get('snapshots')
+    //         .push(response.snapshot)
+    //         .last()
+    //         .assign({ id: Date.now().toString() })
+    //         .write()
+    // })
 
 
 }
@@ -139,6 +140,8 @@ const publishToMAM = async data => {
 }
 
 const handleDonation = async (payment) => {
+    try{
+
     let data = await fetchData()
 
     console.log("nodes count", data.length)
@@ -210,21 +213,24 @@ const handleDonation = async (payment) => {
         }
     }
 
-    return {}
-    // Hash data
-    const hash = sha256(JSON.stringify(data))
+    // return {}
+    // // Hash data
+    // const hash = sha256(JSON.stringify(data))
 
-    let mam_message = {
-        timestamp: Date.now(),
-        data_hash: hash
-    }
-    let mam = await publishToMAM(mam_message)
-    let snapshot = {
-        ...mam_message,
-        root: mam.root
-    }
+    // let mam_message = {
+    //     timestamp: Date.now(),
+    //     data_hash: hash
+    // }
+    // let mam = await publishToMAM(mam_message)
+    // let snapshot = {
+    //     ...mam_message,
+    //     root: mam.root
+    // }
 
-    return { snapshot: snapshot, state: mam.state }
+    // return { snapshot: snapshot, state: mam.state }
+    } catch(err){
+        console.error("Error in handleDonation", err);
+    }
 }
 
 function wereAddressesSpentFrom(addresses, provider) {
