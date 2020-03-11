@@ -203,10 +203,10 @@ const handleDonation = async (payment) => {
                 let payout = await paymentModule.payout.send({
                     address: node.address,
                     value: node.iotas,
-                    message: `einfachIOTA Pool payout!\nYour node has ${node.points} points which is ${Math.floor((node.share*100) * 1000) / 1000}%`,
+                    message: `einfachIOTA Pool donation payout!\nYour node (${node.key}) has ${node.points} points which is ${Math.floor((node.share*100) * 1000) / 1000}% of the total score`,
                     tag
                 })
-                console.log(`Payout with ${payout.value} created for ${payout.address}`);
+                console.log(`Payout with ${payout.value} created for node (${node.key}). Address: ${payout.address}`);
             }
         } catch (e) {
             console.log(e)
