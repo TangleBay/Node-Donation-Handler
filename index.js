@@ -149,7 +149,7 @@ const handleDonation = async (payment) => {
     // make payout
 
     // 1. get node_with_addresses
-    const all_nodes_with_addresses = data.filter((node) => node.address);
+    const all_nodes_with_addresses = data.filter((node) => node.address !== null);
 
     console.log("all_nodes_with_addresses count", all_nodes_with_addresses.length)
 
