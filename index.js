@@ -9,11 +9,12 @@ const low = require('lowdb')
 const FileAsync = require('lowdb/adapters/FileAsync')
 const fetch = require('node-fetch');
 
-const { PROVIDER, URL, APP_PORT } = require('./config.json');
+const { PROVIDER, URL, APP_PORT, IOTAADDRESS } = require('./config.json');
 
 const Mam = require('@iota/mam');
 
 const { asciiToTrytes } = require('@iota/converter')
+let {isValidChecksum} = require('@iota/checksum');
 const generateSeed = require('iota-generate-seed');
 
 let mamState;
@@ -148,8 +149,23 @@ const handleDonation = async (payment) => {
 
     // make payout
 
+    //check if own address is valid
+    if(validAddress(IOTAADDRESS)){
+        //set address for invalid entries
+        data.map(e=> {
+            if(!validAddress(e)){
+            e.address = own_address
+            }
+        })
+    }
+
     // 1. get node_with_addresses
-    const all_nodes_with_addresses = data.filter((node) => node.address !== null);
+    const all_nodes_with_addresses = data.filter((node) => validAddress(node.address));
+
+    //trim spaces
+    for(node of all_nodes_with_addresses){
+        node.address = node.address.trim()
+    }
 
     console.log("all_nodes_with_addresses count", all_nodes_with_addresses.length)
 
@@ -159,7 +175,7 @@ const handleDonation = async (payment) => {
     let nodes_with_addresses = all_nodes_with_addresses.filter((obj, index) => spentStatus[index] == false)
 
     // 2. calculate shares
-    let total_iotas = await paymentModule.getBalance()
+    let total_iotas = payment.txInfo.value
     let total_points = 0;
 
     //calculate total points
@@ -261,4 +277,26 @@ function wereAddressesSpentFrom(addresses, provider) {
             reject(e)
         }
     })
+}
+
+function validAddress(address){
+    if(typeof address == 'undefined'){
+        return false
+    }
+    address = address.trim()
+    try {
+        if (!isValidChecksum(address)) {
+          return false
+        }
+      } catch (e) {
+        console.error(e)
+        return false
+      }
+
+      //check last trit for Kerl address if value transfer
+      if (!/[E-V]/.test(address.slice(80, 81))) {
+        return true
+      } else {
+        return false
+      }
 }
