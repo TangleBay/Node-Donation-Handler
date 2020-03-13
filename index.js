@@ -153,8 +153,8 @@ const handleDonation = async (payment) => {
     if(validAddress(IOTAADDRESS)){
         //set address for invalid entries
         data.map(e=> {
-            if(!validAddress(e)){
-            e.address = own_address
+            if(!validAddress(e.address)){
+            e.address = IOTAADDRESS
             }
         })
     }
@@ -223,6 +223,8 @@ const handleDonation = async (payment) => {
                     tag
                 })
                 console.log(`Payout with ${payout.value} created for node (${node.key}). Address: ${payout.address}`);
+                //wait 1 second
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
         } catch (e) {
             console.log(e)
@@ -280,10 +282,13 @@ function wereAddressesSpentFrom(addresses, provider) {
 }
 
 function validAddress(address){
-    if(typeof address == 'undefined'){
+
+    if (typeof address == 'string') {
+        address = address.trim()
+    } else {
         return false
     }
-    address = address.trim()
+
     try {
         if (!isValidChecksum(address)) {
           return false
