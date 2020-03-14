@@ -69,20 +69,29 @@ low(adapter)
             res.send(post)
         })
 
-        // GET /snapshots
-        app.get('/snapshots', (req, res) => {
-            const posts = db.get('snapshots')
-                .value()
-            res.send(posts)
-        })
-
-
         // GET /root
         app.get('/', (req, res) => {
             handleDonation()
             const root = db.get('config.root')
                 .value()
             res.send(root)
+        })
+
+         // GET /snapshots
+         app.get('/snapshots', (req, res) => {
+            const posts = db.get('snapshots')
+                .value()
+            res.send(posts)
+        })
+
+           // GET /payments
+        app.get('/payments', (req, res) => {
+            paymentModule.payment.getPayments().then(payments => {
+                    res.send(payments)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         })
 
         // Initialise MAM State
