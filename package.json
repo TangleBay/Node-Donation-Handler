@@ -16,7 +16,7 @@
     "cron": "^1.7.0",
     "express": "^4.16.4",
     "iota-generate-seed": "^1.0.0",
-    "iota-payment": "0.0.35",
+    "iota-payment": "0.0.37",
     "js-sha256": "^0.9.0",
     "lowdb": "^1.0.0",
     "request": "^2.88.2"
