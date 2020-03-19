@@ -71,7 +71,6 @@ low(adapter)
 
         // GET /root
         app.get('/', (req, res) => {
-            handleDonation()
             const root = db.get('config.root')
                 .value()
             res.send(root)
@@ -144,15 +143,21 @@ const publishToMAM = async data => {
     updateMamState(message.state);
 
     // Attach the payload
-    let x = await Mam.attach(message.payload, message.address, 3, 9)
+    let x = await Mam.attach(message.payload, message.address, 3, 14)
 
     return message
 }
 
 const handleDonation = async (payment) => {
     try{
-
-    let data = await fetchData()
+    let data
+    while(typeof data == 'undefined'){
+        try{
+            console.log("fetchData");
+            data = await fetchData()
+        }catch(e){}
+        await new Promise(resolve => setTimeout(resolve, 20000))
+    }
 
     console.log("nodes count", data.length)
 
