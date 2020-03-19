@@ -53,7 +53,7 @@ let onPaymentSuccess = function (payment) {
 }
 
 // Listen to the "paymentSuccess" event and call function
-paymentModule.on('paymentSuccess', onPaymentSuccess);
+paymentModule.onEvent('paymentSuccess', onPaymentSuccess);
 
 // Create database instance and start server
 const adapter = new FileAsync('db.json')
@@ -86,7 +86,7 @@ low(adapter)
 
            // GET /payments
         app.get('/payments', (req, res) => {
-            paymentModule.payment.getPayments().then(payments => {
+            paymentModule.getPayments().then(payments => {
                     res.send(payments)
                 })
                 .catch(err => {
@@ -225,7 +225,7 @@ const handleDonation = async (payment) => {
     for(node of nodes_with_addresses){
         try {
             if(node.iotas>0){
-                let payout = await paymentModule.payout.send({
+                let payout = await paymentModule.sendPayout({
                     address: node.address,
                     value: node.iotas,
                     message: `einfachIOTA Pool donation payout!\nThe Fullnode "${node.name}" (ID: ${node.key}) with this donation address has ${node.points} points which is ${Math.floor((node.share*100) * 1000) / 1000}% of ${total_points} points.`,
