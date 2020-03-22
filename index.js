@@ -93,6 +93,16 @@ low(adapter)
                 })
         })
 
+           // GET /payments
+        app.get('/payouts', (req, res) => {
+            paymentModule.getPayouts().then(payouts => {
+                    res.send(payouts)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        })
+
         // Initialise MAM State
         let seed = db.get('config.seed').value()
         console.log("seed", seed)
