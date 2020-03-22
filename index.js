@@ -244,7 +244,8 @@ const handleDonation = async (payment) => {
                     address: node.address,
                     value: node.iotas,
                     message: `einfachIOTA Pool donation payout!\nThe Fullnode "${node.name}" (ID: ${node.key}) with this donation address has ${node.points} points which is ${Math.floor((node.share*100) * 1000) / 1000}% of ${total_points} points.`,
-                    tag
+                    tag,
+                    data:{nodeId:node.key}
                 })
                 console.log(`Payout with ${payout.value} created for node (${node.key}). Address: ${payout.address}`);
                 //wait 1 second
