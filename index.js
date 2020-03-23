@@ -93,9 +93,12 @@ low(adapter)
                 })
         })
 
-           // GET /payments
-        app.get('/payouts', (req, res) => {
+           // GET /payouts/:nodeId
+        app.get('/payouts/:nodeId', (req, res) => {
+            let nodeId =  req.params.nodeId
             paymentModule.getPayouts().then(payouts => {
+                    payouts = payouts.filter(p => typeof p.data != 'undefined')
+                    payouts = payouts.filter(payout => payout.data.nodeId == nodeId).reverse();
                     res.send(payouts)
                 })
                 .catch(err => {
