@@ -109,7 +109,7 @@ low(adapter)
         // GET /balance
         app.get('/balance', (req, res) => {
          paymentModule.getBalance().then(balance => {
-                 res.send(balance)
+                 res.send(balance+" i")
              })
              .catch(err => {
                  console.log(err)
