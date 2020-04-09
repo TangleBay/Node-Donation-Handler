@@ -106,6 +106,16 @@ low(adapter)
                 })
         })
 
+        // GET /balance
+        app.get('/balance', (req, res) => {
+         paymentModule.getBalance().then(balance => {
+                 res.send(balance)
+             })
+             .catch(err => {
+                 console.log(err)
+             })
+        })
+
         // Initialise MAM State
         let seed = db.get('config.seed').value()
         console.log("seed", seed)
@@ -182,6 +192,7 @@ const handleDonation = async (payment) => {
         data.map(e=> {
             if(!validAddress(e.address)){
             e.address = IOTAADDRESS
+            e.key = 'Invalid'
             }
         })
     }
@@ -199,7 +210,17 @@ const handleDonation = async (payment) => {
     //remove spent addresses
     let addresses = all_nodes_with_addresses.map(e => e.address.slice(0, 81))
     let spentStatus = await wereAddressesSpentFrom(addresses)
-    let nodes_with_addresses = all_nodes_with_addresses.filter((obj, index) => spentStatus[index] == false)
+    let nodes_with_addresses
+    if(validAddress(IOTAADDRESS)){
+        nodes_with_addresses = all_nodes_with_addresses.map((obj, index)=>{
+            if(spentStatus[index] == true){
+                obj.address = IOTAADDRESS
+                obj.key = 'Spent'
+            }
+        })
+    }else{
+        nodes_with_addresses = all_nodes_with_addresses.filter((obj, index) => spentStatus[index] == false)
+    }
 
     // 2. calculate shares
     let total_iotas = payment.txInfo.value
