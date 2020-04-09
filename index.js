@@ -212,12 +212,13 @@ const handleDonation = async (payment) => {
     let spentStatus = await wereAddressesSpentFrom(addresses)
     let nodes_with_addresses
     if(validAddress(IOTAADDRESS)){
-        nodes_with_addresses = all_nodes_with_addresses.map((obj, index)=>{
+        all_nodes_with_addresses.map((obj, index)=>{
             if(spentStatus[index] == true){
                 obj.address = IOTAADDRESS
                 obj.key = 'Spent'
             }
         })
+        nodes_with_addresses = all_nodes_with_addresses
     }else{
         nodes_with_addresses = all_nodes_with_addresses.filter((obj, index) => spentStatus[index] == false)
     }
