@@ -12,13 +12,13 @@
   "dependencies": {
     "@iota/core": "^1.0.0-beta.12",
     "@iota/mam": "^0.7.3",
+    "bent": "^7.1.2",
     "cors": "^2.8.5",
     "cron": "^1.7.0",
     "express": "^4.16.4",
     "iota-generate-seed": "^1.0.0",
-    "iota-payment": "0.0.56",
+    "iota-payment": "0.0.58",
     "js-sha256": "^0.9.0",
-    "lowdb": "^1.0.0",
-    "request": "^2.88.2"
+    "lowdb": "^1.0.0"
   }
 }

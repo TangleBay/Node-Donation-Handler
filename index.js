@@ -1,4 +1,4 @@
-const request = require('request')
+const bent = require('bent')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors');
@@ -301,33 +301,20 @@ const handleDonation = async (payment) => {
     }
 }
 
-function wereAddressesSpentFrom(addresses, provider) {
+function wereAddressesSpentFrom(addressesarray) {
     return new Promise(async (resolve, reject) => {
-        try {
-            var command = {
-                command: 'wereAddressesSpentFrom',
-                addresses: addresses
-            }
-
-            var options = {
-                url: PROVIDER,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-IOTA-API-Version': '1',
-                    'Content-Length': Buffer.byteLength(JSON.stringify(command))
-                },
-                json: command
-            }
-
-            request(options, function (error, response, data) {
-                if (!error && response.statusCode == 200) {
-                    resolve(data.states)
-                }
-            })
-        } catch (e) {
-            reject(e)
-        }
+      try {
+        const post = bent(PROVIDER, 'POST', 'json', {
+          'X-IOTA-API-Version': '1'
+        })
+        const response = await post('', {
+          command: 'wereAddressesSpentFrom',
+          addresses: addressesarray
+        })
+        resolve(response.states)
+      } catch (e) {
+        reject(e)
+      }
     })
 }
 
